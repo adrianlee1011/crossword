@@ -1,5 +1,5 @@
 import sys
-
+import itertools
 from crossword import *
 
 
@@ -100,7 +100,7 @@ class CrosswordCreator():
          constraints; in this case, the length of the word.)
         """
         for var in self.domains:
-            for word in self.domains[var]:
+            for word in self.domains[var].copy():
                 if var.length != len(word):
                     self.domains[var].remove(word)
 
@@ -118,7 +118,7 @@ class CrosswordCreator():
         revised = False
         if overlap is not None:
             i, j = overlap
-            for wordX in self.domains[x]:
+            for wordX in self.domains[x].copy():
                 for wordY in self.domains[y]:
                     if wordX[i] != wordY[j]:
                         self.domains[x].remove(wordX)
@@ -135,7 +135,22 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        raise NotImplementedError
+        queue = arcs
+        if arcs is None:
+            queue = list(itertools.permutations(self.domains, r=2))
+
+        while len(queue) > 0:
+            (x, y) = queue.pop(0)
+            if self.revise(x, y):
+                if len(self.domains[x]) == 0:
+                    return False
+                for keyX in self.domains:
+                    for keyY in self.domains:
+                        if keyX != keyY:
+                            if self.crossword.overlaps[keyX, keyY] is not None and keyY != y:
+                                queue.append(keyX, keyY)
+        return True
+
 
     def assignment_complete(self, assignment):
         """
