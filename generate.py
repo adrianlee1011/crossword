@@ -144,11 +144,9 @@ class CrosswordCreator():
             if self.revise(x, y):
                 if len(self.domains[x]) == 0:
                     return False
-                for keyX in self.domains:
-                    for keyY in self.domains:
-                        if keyX != keyY:
-                            if self.crossword.overlaps[keyX, keyY] is not None and keyY != y:
-                                queue.append(keyX, keyY)
+                for z in self.crossword.neighbors(x):
+                    if z != y:
+                        queue.append((z, x))
         return True
 
 
@@ -157,7 +155,10 @@ class CrosswordCreator():
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        raise NotImplementedError
+        for var in self.domains:
+            if var not in assignment:
+                return False
+        return True
 
     def consistent(self, assignment):
         """
