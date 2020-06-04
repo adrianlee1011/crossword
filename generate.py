@@ -123,7 +123,6 @@ class CrosswordCreator():
                 for wordY in self.domains[y]:
                     if wordX[i] == wordY[j]:
                         satisfy = True
-                        print(overlap, wordX, wordY)
                 if not satisfy:
                     self.domains[x].remove(wordX)
                     revised = True
@@ -173,19 +172,23 @@ class CrosswordCreator():
         # all values distinct
         # every value is correct length
         # no conflicts between neighbouring variables
+        wordList = []
         for var in assignment:
-            words = assignment[var]
-            if len(words) != len(set(words)):
+            word = assignment[var]
+            if word in wordList:
                 return False
-            for word in words:
-                if len(word) != var.length:
-                    return False
+            else:
+                wordList.append(word)
+
+            if len(word) != var.length:
+                return False
             neighbors = self.crossword.neighbors(var)
             for x in neighbors:
                 i, j = self.crossword.overlaps[var, x]
-                xWords = assignment[x]
-                if words[i] != xWords[j]:
-                    return False
+                if x in assignment:
+                    xWord = assignment[x]
+                    if word[i] != xWord[j]:
+                        return False
 
         return True
             
