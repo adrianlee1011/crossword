@@ -217,7 +217,6 @@ class CrosswordCreator():
             if var not in assignment:
                 varDict[var] = len(self.domains[var])
         sortedVarDict = {k: v for k, v in sorted(varDict.items(), key=lambda item: item[1])}
-
         # create a list of variables from the sorted dictionary
         sortedVarList = list(sortedVarDict)
         minKey = []
@@ -235,9 +234,9 @@ class CrosswordCreator():
             for key in minKey:
                 highDeg[key] = len(self.crossword.neighbors(key))
             sortedHighDeg = {k: v for k, v in sorted(highDeg.items(), key=lambda item: item[1])}
-
             # create a list of variables from the sorted dictionary
             sortedHighDegList = list(sortedHighDeg)
+            sortedHighDegList.reverse()
             maxHighDeg = []
             for i in range(len(sortedHighDegList)):
                 if len(maxHighDeg) == 0:
