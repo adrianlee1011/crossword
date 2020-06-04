@@ -1,5 +1,6 @@
 import sys
 import itertools
+import math
 from crossword import *
 
 
@@ -139,6 +140,7 @@ class CrosswordCreator():
         return False if one or more domains end up empty.
         """
         queue = arcs
+        # all possible permutations of the arcs
         if arcs is None:
             queue = list(itertools.permutations(self.domains, r=2))
 
@@ -210,9 +212,48 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
+        varDict = dict()
         for var in self.domains:
             if var not in assignment:
-                return var
+                varDict[var] = len(self.domains[var])
+        sortedVarDict = {k: v for k, v in sorted(varDict.items(), key=lambda item: item[1])}
+
+        # create a list of variables from the sorted dictionary
+        sortedVarList = list(sortedVarDict)
+        minKey = []
+        for i in range(len(sortedVarList)):
+            if len(minKey) == 0:
+                minKey.append(sortedVarList[i])
+            else:
+                # check if there are ties
+                if sortedVarDict[sortedVarList[i]] == sortedVarDict[sortedVarList[i - 1]]:
+                    minKey.append(sortedVarList[i])
+
+        # if there is a tie on minimum number of variables
+        if len(minKey) > 1:
+            highDeg = dict()
+            for key in minKey:
+                highDeg[key] = len(self.crossword.neighbors(key))
+            sortedHighDeg = {k: v for k, v in sorted(highDeg.items(), key=lambda item: item[1])}
+
+            # create a list of variables from the sorted dictionary
+            sortedHighDegList = list(sortedHighDeg)
+            maxHighDeg = []
+            for i in range(len(sortedHighDegList)):
+                if len(maxHighDeg) == 0:
+                    maxHighDeg.append(sortedHighDegList[i])
+                else:
+                    # check if there are ties
+                    if sortedHighDeg[sortedHighDegList[i]] == sortedHighDeg[sortedHighDegList[i - 1]]:
+                        maxHighDeg.append(sortedHighDegList[i])
+            
+            return maxHighDeg[0]
+        
+        # else return the first variable in minkey
+        else:
+            return minKey[0]
+        
+            
 
     def backtrack(self, assignment):
         """
