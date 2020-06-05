@@ -10,3 +10,4 @@ Algorithms used:
 - Backtracking algorithm to solve the crossword.
 
 Example crossword:
+![alt text](https://github.com/adrianlee1011/crossword/blob/master/output.png)
